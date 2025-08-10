@@ -30,3 +30,6 @@ val TetrisPurpleBorderColor = Color(0xFF775DD0)
 
 val TetrisOrangeColor = Color(0xFFFFC000)
 val TetrisOrangeBorderColor = Color(0xFFFF9933)
+
+val TetrisPinkColor = Color(0xFFFF99FF)
+val TetrisPinkBorderColor = Color(0xFFCC66FF)
