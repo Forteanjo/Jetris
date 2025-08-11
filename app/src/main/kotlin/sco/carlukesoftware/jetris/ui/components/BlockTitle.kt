@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sco.carlukesoftware.jetris.ui.data.BlockColor
+import sco.carlukesoftware.jetris.ui.data.BlockColors
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueColor
@@ -26,12 +28,12 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisYellowColor
 fun BlockTitle(modifier: Modifier = Modifier) {
     val title = "JETRIS"
     val colors = arrayOf(
-        Pair(TetrisRedColor, TetrisRedBorderColor),
-        Pair(TetrisYellowColor, TetrisYellowBorderColor),
-        Pair(TetrisBlueColor, TetrisBlueBorderColor),
-        Pair(TetrisOrangeColor, TetrisOrangeBorderColor),
-        Pair(TetrisPurpleColor, TetrisPurpleBorderColor),
-        Pair(TetrisGreenColor, TetrisGreenBorderColor),
+        BlockColors(TetrisRedColor, TetrisRedBorderColor),
+        BlockColors(TetrisYellowColor, TetrisYellowBorderColor),
+        BlockColors(TetrisBlueColor, TetrisBlueBorderColor),
+        BlockColors(TetrisOrangeColor, TetrisOrangeBorderColor),
+        BlockColors(TetrisPurpleColor, TetrisPurpleBorderColor),
+        BlockColors(TetrisGreenColor, TetrisGreenBorderColor),
     )
 
     Row(
@@ -41,8 +43,8 @@ fun BlockTitle(modifier: Modifier = Modifier) {
         title.forEachIndexed { index, char ->
             CharBlock(
                 size = 60.dp,
-                blockColor = colors[index].first,
-                borderColor = colors[index].second,
+                blockColor = colors[index].blockColor,
+                borderColor = colors[index].borderColor,
                 char = char
             )
         }

@@ -25,8 +25,8 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisGridColor
 
 @Composable
 fun Block(
-    size: Dp = 100.dp,
-    borderWidth: Dp = 4.dp,
+    size: Dp = 50.dp,
+    borderWidth: Dp = 2.dp,
     blockColor: Color = TetrisGridColor,
     borderColor: Color = TetrisGridBorderColor
 ) {
