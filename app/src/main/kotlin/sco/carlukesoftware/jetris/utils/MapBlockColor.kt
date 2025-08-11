@@ -7,6 +7,8 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisBlueBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisGreenBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisGreenColor
+import sco.carlukesoftware.jetris.ui.theme.TetrisGridBorderColor
+import sco.carlukesoftware.jetris.ui.theme.TetrisGridColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisOrangeBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisOrangeColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisPinkBorderColor
@@ -20,7 +22,7 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisYellowColor
 
 fun BlockColor.toBlockColors(): BlockColors =
     when (this) {
-        BlockColor.EMPTY -> BlockColors(Color.Transparent, Color.Transparent)
+        BlockColor.EMPTY -> BlockColors(TetrisGridColor, TetrisGridBorderColor)
         BlockColor.RED -> BlockColors(TetrisRedColor, TetrisRedBorderColor)
         BlockColor.BLUE -> BlockColors(TetrisBlueColor, TetrisBlueBorderColor)
         BlockColor.GREEN -> BlockColors(TetrisGreenColor, TetrisGreenBorderColor)

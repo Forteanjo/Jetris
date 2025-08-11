@@ -36,11 +36,11 @@ fun Block(
             .border(
                 width = borderWidth,
                 color = borderColor,
-                shape = MaterialTheme.shapes.small
+                shape = MaterialTheme.shapes.extraSmall
             )
             .background(
                 color = blockColor, // Set the actual block color here
-                shape = MaterialTheme.shapes.small
+                shape = MaterialTheme.shapes.extraSmall
             )
     )
 }
