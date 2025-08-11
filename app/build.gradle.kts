@@ -40,6 +40,7 @@ android {
 
     kotlin {
         compilerOptions {
+            freeCompilerArgs.add("-Xcontext-sensitive-resolution")
             jvmTarget = JvmTarget.fromTarget("21")
         }
     }

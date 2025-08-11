@@ -1,29 +1,33 @@
 package sco.carlukesoftware.jetris.ui.components
 
-import android.net.wifi.hotspot2.pps.HomeSp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import sco.carlukesoftware.jetris.ui.data.BlockColor
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.utils.toBlockColors
 
 @Composable
-fun HomeScreenGrid(modifier: Modifier = Modifier) {
+fun GameScreenGrid(
+    gameGrid: Array<Array<BlockColor>>,
+    modifier: Modifier = Modifier,
+    blockSize: Dp = 25.dp
+) {
     Column(
         modifier = modifier
             .padding(1.dp)
     ) {
-        homeScreenGrid.forEachIndexed { rowIndex, row ->
+        gameGrid.forEachIndexed { rowIndex, row ->
             Row {
                 row.forEach { block ->
                     val blockColors = block.toBlockColors()
                     Block(
-                        size = 30.dp,
+                        size = blockSize,
                         borderWidth = 4.dp,
                         blockColor = blockColors.blockColor,
                         borderColor = blockColors.borderColor
@@ -38,13 +42,15 @@ fun HomeScreenGrid(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenGridPreview() {
+private fun GameScreenGridPreview() {
     JetrisTheme {
-        HomeScreenGrid()
+        GameScreenGrid(
+            gameGrid = homeScreenGrid
+        )
     }
 }
 
-private val homeScreenGrid =
+val homeScreenGrid =
     arrayOf(
         arrayOf(
             BlockColor.EMPTY, BlockColor.EMPTY, BlockColor.EMPTY, BlockColor.EMPTY, BlockColor.EMPTY,
