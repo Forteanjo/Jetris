@@ -181,6 +181,44 @@ fun GameGrid.mergeAndCenterShape(
     return newGrid
 }
 
+
+/**
+ * Merges a shape into the game grid at a specified position.
+ *
+ * This function creates a deep copy of the current grid and then overlays the
+ * non-empty blocks of the given `shape` onto this copy. The `topRow` and `leftCol`
+ * parameters specify the top-left corner of where the shape should be placed
+ * on the grid.
+ *
+ * Cells in the `shape` that are `BlockColor.EMPTY` are considered transparent
+ * and will not overwrite the corresponding cells in the grid.
+ *
+ * Boundary checks are performed: if any part of the shape would be placed
+ * outside the grid's dimensions, that part is ignored (not merged).
+ *
+ * @receiver The base `GameGrid` onto which the shape will be merged.
+ * @param shape The `GameGrid` representing the shape to merge.
+ * @param topRow The row index in the base grid where the top of the shape will be placed.
+ * @param leftCol The column index in the base grid where the left of the shape will be placed.
+ * @return A new `GameGrid` instance with the shape merged into it. The original
+ *         grid remains unchanged.
+ */
+fun GameGrid.mergeShapeIntoGrid(shape: GameGrid, topRow: Int, leftCol: Int): GameGrid {
+    val newGrid = this.deepCopy()
+    shape.forEachIndexed { r, rowArray ->
+        rowArray.forEachIndexed { c, blockColor ->
+            if (blockColor != BlockColor.EMPTY) {
+                val targetR = topRow + r
+                val targetC = leftCol + c
+                if (targetR in newGrid.indices && targetC in newGrid[0].indices) {
+                    newGrid[targetR][targetC] = blockColor
+                }
+            }
+        }
+    }
+    return newGrid
+}
+
 /**
  * Clears a shape from a given position on the grid by setting its non-empty cells to EMPTY.
  *
@@ -231,4 +269,77 @@ fun GameGrid.clearShapeFromGrid(
     }
 
     return newGrid
+}
+
+/**
+ * Checks for collisions if a shape were placed at a given position on the grid.
+ *
+ * @receiver The main game grid containing already locked blocks.
+ * @param shape The 2D array representing the piece's shape.
+ * @param potentialTopRow The potential top row index on the grid for the shape.
+ * @param potentialLeftCol The potential left column index on the grid for the shape.
+ * @param shapeEmptyColor The BlockColor in the 'shape' array that represents an empty part
+ *                        of the shape's bounding box (these parts are ignored for collision).
+ * @return True if a collision would occur, false otherwise.
+ */
+fun GameGrid.hasCollision(
+    shape: GameGrid,
+    potentialTopRow: Int,
+    potentialLeftCol: Int,
+    shapeEmptyColor: BlockColor = BlockColor.EMPTY
+): Boolean {
+    val gridRows = this.size
+    if (gridRows == 0 && shape.isNotEmpty()) return true // Cannot place on empty grid if shape exists
+    val gridCols = if (gridRows > 0) this[0].size else 0
+    if (gridCols == 0 && shape.isNotEmpty() && shape[0].isNotEmpty()) return true
+
+    val shapeRows = shape.size
+    if (shapeRows == 0) return false // Empty shape causes no collision
+    val shapeCols = shape[0].size
+    if (shapeCols == 0) return false
+
+    for (r in 0 until shapeRows) { // Iterate through the shape's rows
+        for (c in 0 until shapeCols) { // Iterate through the shape's columns
+            val shapeCellColor = shape[r][c]
+
+            // Only check collision for solid parts of the shape
+            if (shapeCellColor != shapeEmptyColor) {
+                val targetGridRow = potentialTopRow + r
+                val targetGridCol = potentialLeftCol + c
+
+                // 1. Check for Out of Bounds (Left, Right, Bottom)
+                // Top boundary (targetGridRow < 0) might be handled differently
+                // (e.g., allow spawning partially off-screen initially, but not for movement).
+                // For general movement collision, going off the top isn't usually a "collision"
+                // that stops movement, but rather an invalid state for locking.
+
+                if (targetGridCol < 0 || targetGridCol >= gridCols || targetGridRow >= gridRows) {
+                    return true // Collision with left, right, or bottom boundary
+                }
+
+                // It's also possible to collide with the top if potentialTopRow + r < 0,
+                // but usually pieces spawn such that this isn't an immediate issue for the
+                // first few cells of the shape. If a piece can rotate such that a part of it
+                // is above row 0, you'd add: targetGridRow < 0
+                // For now, focusing on side and bottom boundaries for active piece movement.
+
+                // 2. Check for Overlap with Locked Blocks (if within bounds)
+                // This check assumes targetGridRow is not negative. If it can be, add it above.
+                if (targetGridRow >= 0) { // Ensure we don't try to access grid[-1]
+                    if (this[targetGridRow][targetGridCol] != BlockColor.EMPTY) {
+                        return true // Collision with an existing locked block
+                    }
+                } else {
+                    // This case (targetGridRow < 0) means part of the piece is above the grid.
+                    // Depending on game rules, this might be a collision or an invalid spawn.
+                    // For typical Tetris piece movement, this could be a collision if not allowed.
+                    // For spawning, pieces often start partially above the visible grid.
+                    // If pieces must always be fully within grid boundaries (0 to gridRows-1):
+                    return true // Collision with top boundary
+                }
+            }
+        }
+    }
+
+    return false // No collision detected
 }
