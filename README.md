@@ -79,7 +79,7 @@ Jetris is a classic Tetris game clone built for Android using modern Android dev
 Font: [Planet Benson - Typodermic Fonts](https://www.1001freefonts.com/designer-typodermic-fonts-fontlisting.php)
 
 ## License
-This project is licensed under the MIT License - see the [LICENCE](LICENCE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 Donald McCaskey - [forteanjo@sky.com](mailto:forteanjo@sky.com)
