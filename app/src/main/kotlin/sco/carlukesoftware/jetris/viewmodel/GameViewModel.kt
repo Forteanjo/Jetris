@@ -136,7 +136,9 @@ class GameViewModel : ViewModel() {
                 potentialLeftCol = newPiece.col
             )
             ) {
-            _gameState.update { it.copy(isGameOver = true) }
+            _gameState.update { gameState ->
+                gameState.copy(isGameOver = true)
+            }
             gameLoopJob?.cancel()
             return
         }
@@ -150,8 +152,8 @@ class GameViewModel : ViewModel() {
             )
 
         val nextRandomColor = BlockColor.randomPlayable()
-        _gameState.update {
-            it.copy(
+        _gameState.update { gameState ->
+            gameState.copy(
                 grid = gridWithNewPiece,
                 currentPiece = newPiece,
                 nextPieceColor = nextRandomColor
@@ -160,7 +162,33 @@ class GameViewModel : ViewModel() {
         prepareNextPieceDisplay() // Update the "next piece" display
     }
 
-    fun movePiece(deltaCol: Int, deltaRow: Int) {
+    /**
+     * Attempts to move the current piece on the game grid by the specified delta column and row.
+     *
+     * If the game is over or there's no current piece, the function returns immediately.
+     * It calculates the potential new position of the piece.
+     *
+     * The process involves:
+     * 1. Creating a temporary representation of the grid with the current piece cleared from its old position.
+     * 2. Checking if the piece, at its potential new position, would collide with existing blocks or grid boundaries
+     *    on this temporary grid.
+     * 3. If no collision is detected:
+     *    a. The piece is merged into the temporary grid at its new position.
+     *    b. The game state is updated with this new grid and the piece's updated coordinates.
+     * 4. If a collision is detected:
+     *    a. If the collision occurred while the piece was moving downwards (deltaRow > 0),
+     *       the piece is locked in its current position (on the grid *before* this attempted move),
+     *       lines are cleared if any, and a new piece is spawned.
+     *    b. If the collision was horizontal (e.g., trying to move into a wall or another piece sideways),
+     *       the piece simply does not move, and its position remains unchanged.
+     *
+     * @param deltaCol The change in the piece's column position (e.g., -1 for left, 1 for right, 0 for no horizontal change).
+     * @param deltaRow The change in the piece's row position (e.g., 1 for down, 0 for no vertical change).
+     */
+    fun movePiece(
+        deltaCol: Int,
+        deltaRow: Int
+    ) {
         val currentGameState = _gameState.value
         val piece = currentGameState.currentPiece ?: return
         if (currentGameState.isGameOver) return
@@ -169,7 +197,12 @@ class GameViewModel : ViewModel() {
         val potentialNewCol = piece.col + deltaCol
 
         // 1. Clear current piece from a temporary representation of the grid
-        val gridWithoutOldPiece = currentGameState.grid.clearShapeFromGrid(piece.shape, piece.row, piece.col)
+        val gridWithoutOldPiece = currentGameState.grid
+            .clearShapeFromGrid(
+                shape = piece.shape,
+                shapeTopRow = piece.row,
+                shapeLeftCol = piece.col
+            )
 
         // 2. Check for collision at the new position
         if (!gridWithoutOldPiece
@@ -180,10 +213,23 @@ class GameViewModel : ViewModel() {
             )
             ) {
             // No collision: Move the piece
-            val newGridWithMovedPiece = gridWithoutOldPiece.mergeShapeIntoGrid(piece.shape, potentialNewRow, potentialNewCol)
-            val updatedPiece = piece.copy(row = potentialNewRow, col = potentialNewCol)
-            _gameState.update {
-                it.copy(grid = newGridWithMovedPiece, currentPiece = updatedPiece)
+            val newGridWithMovedPiece = gridWithoutOldPiece
+                .mergeShapeIntoGrid(
+                    shape = piece.shape,
+                    topRow = potentialNewRow,
+                    leftCol = potentialNewCol
+                )
+            val updatedPiece = piece
+                .copy(
+                    row = potentialNewRow,
+                    col = potentialNewCol
+                )
+            _gameState.update { gameState ->
+                gameState
+                    .copy(
+                        grid = newGridWithMovedPiece,
+                        currentPiece = updatedPiece
+                    )
             }
         } else {
             // Collision detected
@@ -255,6 +301,7 @@ class GameViewModel : ViewModel() {
                 // Update level and gameSpeedMillis if necessary
             )
         }
+
         spawnNewPiece() // Spawn the next piece
     }
 
@@ -283,231 +330,62 @@ class GameViewModel : ViewModel() {
         return Pair(newGrid, linesClearedCount)
     }
 
+    // --- PUBLIC EVENT HANDLERS for UI Controls ---
+    fun onMoveLeft() {
+        if (_gameState.value.isGameOver || _gameState.value.currentPiece == null) return
+        movePiece(-1, 0) // deltaCol = -1, deltaRow = 0
+    }
+
+    fun onMoveRight() {
+        if (_gameState.value.isGameOver || _gameState.value.currentPiece == null) return
+        movePiece(1, 0)  // deltaCol = 1, deltaRow = 0
+    }
+
+    fun onRotate() {
+        if (_gameState.value.isGameOver || _gameState.value.currentPiece == null) return
+        rotatePiece()
+    }
+
+    fun onMoveDown() { // Soft drop by player
+        if (_gameState.value.isGameOver || _gameState.value.currentPiece == null) return
+        movePiece(0, 1)  // deltaCol = 0, deltaRow = 1
+    }
+
+    fun onHardDrop() { // Optional: Implement hard drop
+        if (_gameState.value.isGameOver || _gameState.value.currentPiece == null) return
+        val piece = _gameState.value.currentPiece!!
+        val currentGrid = _gameState.value.grid
+
+        // Keep moving down until collision
+        val tempGridAfterClearing = currentGrid
+            .clearShapeFromGrid(
+                shape = piece.shape,
+                shapeTopRow = piece.row,
+                shapeLeftCol = piece.col
+            )
+        var newRow = piece.row
+        while (!tempGridAfterClearing
+            .hasCollision(
+                shape = piece.shape,
+                potentialTopRow = newRow + 1,
+                potentialLeftCol = piece.col
+            )
+        ) {
+            newRow++
+        }
+
+        // Lock at the final position
+        val finalPiece = piece.copy(row = newRow)
+        // The grid passed to lockPieceAndSpawnNew should be the one BEFORE this final piece is merged
+        lockPieceAndSpawnNew(
+            gridToLockOn = tempGridAfterClearing,
+            pieceToLock = finalPiece
+        )
+    }
+
     override fun onCleared() {
         super.onCleared()
         gameLoopJob?.cancel() // Ensure the loop is stopped when ViewModel is destroyed
     }
-
-
-        var startingRow: Int = 0
-
-    var num1 = 0
-    var num2 = 0
-    var num3 = 0
-    var num4 = 0
-
-    var shapeIs = 0
-    var lines = 0
-    var once = 0
-
-    /**
-     * How to use in your Jetris game:
-     *
-     * 1.   When a new piece is spawned, you would call mergeAndCenterShape with your main game grid
-     *      and the piece's current shape array.
-     *
-     * 2.   When a piece moves, you would typically:
-     *  •   First, "clear" the piece from its old position on a temporary grid (by merging it
-     *      with BlockColor.EMPTY where the piece was).
-     *  •   Then, calculate the new position.
-     *  •   Then, merge the piece into the temporary grid at its new position using
-     *      mergeAndCenterShape with customStartRow and customStartCol set to the piece's new
-     *      top-left coordinates.
-     *  •   Check for collisions after this merge.
-     *  •   If no collision, this temporary grid becomes the new main game grid.
-     */
-    private fun nextShape(): BlockColor {
-        val nextBlock = BlockColor.randomPlayable()
-        _nextBlockGrid.value = emptyNextBlockGrid.mergeAndCenterShape(
-            shape = nextBlock.toBlockShape(),
-        )
-
-        return nextBlock
-    }
-
-/*
-    // --- Inside your game state or ViewModel ---
-    var currentGameGrid: GameGrid = initialEmptyGrid()
-    var currentPiece: TetrisPiece? = null // Holds current piece's shape, position, etc.
-
-    fun movePiece(direction: Direction) {
-        if (currentPiece == null) return
-
-        val piece = currentPiece!!
-
-        // 1. Create a temporary grid with the current piece cleared from its OLD position
-        val gridWithoutOldPiece = clearShapeFromGrid(
-            currentGameGrid,
-            piece.currentShapeArray, // The 2D array of the piece
-            piece.row,               // Piece's current top row
-            piece.col                // Piece's current left col
-        )
-
-        // 2. Calculate the piece's NEW potential position
-        val newRow = piece.row + direction.deltaRow // However you calculate new position
-        val newCol = piece.col + direction.deltaCol
-
-        // 3. Attempt to place/merge the piece at its NEW position on the temporary grid
-        //    You'd use a function like `mergeShapeIntoGrid(grid, shape, newRow, newCol)`
-        //    This merge function would also typically perform collision detection.
-        val (potentialNewGrid, collisionDetected) = tryPlacingPiece(
-            gridWithoutOldPiece,
-            piece.currentShapeArray,
-            newRow,
-            newCol
-        )
-
-        if (!collisionDetected) {
-            // 4. If no collision, update the main game grid and the piece's position
-            currentGameGrid = potentialNewGrid
-            currentPiece = piece.copy(row = newRow, col = newCol)
-            // Update UI
-        } else {
-            // Handle collision (e.g., piece locks if moving down, or invalid move)
-            // If the collision was with the bottom or other locked pieces when moving down:
-            if (direction == androidx.test.uiautomator.Direction.DOWN) {
-                lockPieceAndSpawnNewOne() // You'd merge the piece onto currentGameGrid at its last valid spot
-            }
-            // Else, the move was invalid (e.g., into a wall), so piece doesn't move.
-            // The currentGameGrid remains as it was before this attempted move.
-        }
-    }
-
-    // Dummy tryPlacingPiece for illustration
-    data class PlacementResult(val grid: GameGrid, val collision: Boolean)
-
-    fun tryPlacingPiece(grid: GameGrid, shape: GameGrid, newRow: Int, newCol: Int): PlacementResult {
-        // This function would merge the shape into a copy of the grid at newRow, newCol.
-        // It would check if any part of the shape overlaps with existing blocks in the grid
-        // or goes out of bounds.
-        // For simplicity, let's assume it always succeeds for now and just merges.
-        val tempGrid = grid.deepCopy()
-        var collision = false
-
-        for (r in 0 until shape.size) {
-            for (c in 0 until shape[0].size) {
-                if (shape[r][c] != BlockColor.EMPTY) {
-                    val targetR = newRow + r
-                    val targetC = newCol + c
-                    if (targetR < 0 || targetR >= tempGrid.size || targetC < 0 || targetC >= tempGrid[0].size ||
-                        tempGrid[targetR][targetC] != BlockColor.EMPTY) {
-                        collision = true
-                        break // Found collision
-                    }
-                    // tempGrid[targetR][targetC] = shape[r][c] // Only merge if no collision check for whole piece is done first
-                }
-            }
-            if (collision) break
-        }
-
-        if (!collision) {
-            for (r in 0 until shape.size) {
-                for (c in 0 until shape[0].size) {
-                    if (shape[r][c] != BlockColor.EMPTY) {
-                        val targetR = newRow + r
-                        val targetC = newCol + c
-                        tempGrid[targetR][targetC] = shape[r][c]
-                    }
-                }
-            }
-            return PlacementResult(tempGrid, false)
-        }
-
-        return PlacementResult(grid, true) // Return original grid and collision true
-    }
-
-    This "clear-then-try-place" strategy is fundamental for Tetris-like game
-*/
-
-    /**
-     * // --- Inside your game state or ViewModel ---
-     * // (Similar to the `movePiece` example from the "clearShapeFromGrid" answer)
-     *
-     * fun attemptMove(piece: TetrisPiece, deltaRow: Int, deltaCol: Int): Boolean {
-     *     val potentialNewRow = piece.row + deltaRow
-     *     val potentialNewCol = piece.col + deltaCol
-     *
-     *     if (!hasCollision(currentGameGrid, piece.currentShapeArray, potentialNewRow, potentialNewCol)) {
-     *         // No collision, actual move can happen
-     *         // 1. Clear piece from old position on a temporary grid (or the main grid if that's your strategy)
-     *         val gridWithoutOldPiece = clearShapeFromGrid(currentGameGrid, piece.currentShapeArray, piece.row, piece.col)
-     *         // 2. Merge piece into new position on this temporary grid
-     *         currentGameGrid = mergeShapeIntoGrid(gridWithoutOldPiece, piece.currentShapeArray, potentialNewRow, potentialNewCol) // Assuming you have mergeShapeIntoGrid
-     *         currentPiece = piece.copy(row = potentialNewRow, col = potentialNewCol)
-     *         return true // Move was successful
-     *     }
-     *     return false // Move failed due to collision
-     * }
-     *
-     * fun attemptRotate(piece: TetrisPiece): Boolean {
-     *     val rotatedShape = piece.currentShapeArray.rotateClockwise() // Or your rotation logic
-     *     if (!hasCollision(currentGameGrid, rotatedShape, piece.row, piece.col)) {
-     *         // No collision with rotated shape at current position
-     *         val gridWithoutOldPiece = clearShapeFromGrid(currentGameGrid, piece.currentShapeArray, piece.row, piece.col)
-     *         currentGameGrid = mergeShapeIntoGrid(gridWithoutOldPiece, rotatedShape, piece.row, piece.col)
-     *         currentPiece = piece.copy(currentShapeArray = rotatedShape)
-     *         return true // Rotation successful
-     *     }
-     *     // Optional: Implement wall kicks here if rotation fails
-     *     return false // Rotation failed
-     * }
-     *
-     * // When a piece is moving down automatically (game tick):
-     * fun gameTick() {
-     *     if (currentPiece == null) spawnNewPiece()
-     *
-     *     currentPiece?.let { piece ->
-     *         val potentialNewRow = piece.row + 1 // Moving down one step
-     *         val potentialNewCol = piece.col
-     *
-     *         if (hasCollision(currentGameGrid, piece.currentShapeArray, potentialNewRow, potentialNewCol)) {
-     *             // Collision detected when trying to move down
-     *             lockPieceAndSpawnNewOne(piece)
-     *         } else {
-     *             // No collision, move the piece down
-     *             val gridWithoutOldPiece = clearShapeFromGrid(currentGameGrid, piece.currentShapeArray, piece.row, piece.col)
-     *             currentGameGrid = mergeShapeIntoGrid(gridWithoutOldPiece, piece.currentShapeArray, potentialNewRow, potentialNewCol)
-     *             currentPiece = piece.copy(row = potentialNewRow)
-     *         }
-     *     }
-     *     // Update UI
-     * }
-     *
-     * fun lockPieceAndSpawnNewOne(pieceToLock: TetrisPiece) {
-     *     // The piece is already at its final resting place (pieceToLock.row, pieceToLock.col)
-     *     // currentGameGrid should reflect this state *before* this function is called,
-     *     // OR, if you haven't moved it to the colliding spot, merge it at its last valid spot.
-     *
-     *     // For simplicity, let's assume currentGameGrid already has the piece at its
-     *     // last valid non-colliding position before the *colliding* move down was attempted.
-     *     // So, we just need to "finalize" it on the grid (which is already done by mergeShapeIntoGrid)
-     *
-     *     // Check for cleared lines
-     *     // clearLines()
-     *     // Add score
-     *
-     *     spawnNewPiece()
-     *     // Check for game over (if new piece immediately collides)
-     * }
-     *
-     * // Dummy merge function
-     * fun mergeShapeIntoGrid(grid: GameGrid, shape: GameGrid, row: Int, col: Int): GameGrid {
-     *     val newGrid = grid.deepCopy()
-     *     for (r in 0 until shape.size) {
-     *         for (c in 0 until shape[0].size) {
-     *             if (shape[r][c] != BlockColor.EMPTY) {
-     *                 if ((row + r >= 0 && row + r < newGrid.size) && (col + c >= 0 && col + c < newGrid[0].size)) {
-     *                     newGrid[row + r][col + c] = shape[r][c]
-     *                 }
-     *             }
-     *         }
-     *     }
-     *     return newGrid
-     * }
-     *
-     *
-     */
-
-
 
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,9 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     gameViewModel: GameViewModel = koinInject()
 ) {
+    val gameState = gameViewModel.gameState.collectAsState()
+    val nextBlockGrid = gameViewModel.nextBlockGrid.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize(),
@@ -58,7 +62,7 @@ fun GameScreen(
             verticalAlignment = Alignment.Top,
         ) {
             GameScreenGrid(
-                gameGrid = emptyGameGrid,
+                gameGrid = gameState.value.grid,
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -69,7 +73,7 @@ fun GameScreen(
             )
 
             GameScreenGrid(
-                gameGrid = emptyNextBlockGrid,
+                gameGrid = nextBlockGrid.value,
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -83,10 +87,10 @@ fun GameScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             GameButtons(
-                onMoveLeft = { },
-                onMoveRight = { },
-                onRotate = { },
-                onMoveDown = { }
+                onMoveLeft = { gameViewModel.onMoveLeft() },
+                onMoveRight = { gameViewModel.onMoveRight() },
+                onRotate = { gameViewModel.onRotate() },
+                onMoveDown = { gameViewModel.onHardDrop() },
             )
         }
     }
