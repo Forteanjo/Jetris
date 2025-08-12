@@ -1,8 +1,7 @@
 package sco.carlukesoftware.jetris.utils
 
-import androidx.compose.ui.graphics.Color
-import sco.carlukesoftware.jetris.ui.data.BlockColor
-import sco.carlukesoftware.jetris.ui.data.BlockColors
+import sco.carlukesoftware.jetris.data.BlockColor
+import sco.carlukesoftware.jetris.data.BlockColors
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisGreenBorderColor
@@ -30,4 +29,16 @@ fun BlockColor.toBlockColors(): BlockColors =
         BlockColor.YELLOW -> BlockColors(TetrisYellowColor, TetrisYellowBorderColor)
         BlockColor.ORANGE -> BlockColors(TetrisOrangeColor, TetrisOrangeBorderColor)
         BlockColor.PINK -> BlockColors(TetrisPinkColor, TetrisPinkBorderColor)
+    }
+
+fun BlockColor.toBlockShape(): GameGrid =
+    when (this) {
+        BlockColor.EMPTY -> emptyGameGrid
+        BlockColor.RED -> redShape
+        BlockColor.BLUE -> blueShape
+        BlockColor.GREEN -> greenShape
+        BlockColor.PURPLE -> purpleShape
+        BlockColor.YELLOW -> yellowShape
+        BlockColor.ORANGE -> orangeShape
+        BlockColor.PINK -> pinkShape
     }

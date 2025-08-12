@@ -1,4 +1,4 @@
-package sco.carlukesoftware.jetris.ui.data
+package sco.carlukesoftware.jetris.data
 
 import androidx.compose.ui.graphics.Color
 

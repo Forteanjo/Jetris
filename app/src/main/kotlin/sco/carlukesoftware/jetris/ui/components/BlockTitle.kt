@@ -6,8 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import sco.carlukesoftware.jetris.ui.data.BlockColor
-import sco.carlukesoftware.jetris.ui.data.BlockColors
+import sco.carlukesoftware.jetris.data.BlockColors
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisBlueColor
@@ -15,8 +14,6 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisGreenBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisGreenColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisOrangeBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisOrangeColor
-import sco.carlukesoftware.jetris.ui.theme.TetrisPinkBorderColor
-import sco.carlukesoftware.jetris.ui.theme.TetrisPinkColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisPurpleBorderColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisPurpleColor
 import sco.carlukesoftware.jetris.ui.theme.TetrisRedBorderColor
