@@ -27,6 +27,7 @@ import sco.carlukesoftware.jetris.ui.theme.TetrisGridBorderColor
 
 @Composable
 fun HomeScreen(
+    onPlayGameClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -77,7 +78,7 @@ fun HomeScreen(
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = onPlayGameClick,
             modifier = modifier
         ) {
             Text(
@@ -94,6 +95,8 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     JetrisTheme {
-        HomeScreen()
+        HomeScreen(
+            onPlayGameClick = { }
+        )
     }
 }

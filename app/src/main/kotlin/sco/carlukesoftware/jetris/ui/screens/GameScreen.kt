@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
 import sco.carlukesoftware.jetris.ui.components.BlockTitle
 import sco.carlukesoftware.jetris.ui.components.GameButtons
 import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
@@ -22,9 +23,14 @@ import sco.carlukesoftware.jetris.ui.components.homeScreenGrid
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.utils.emptyGameGrid
 import sco.carlukesoftware.jetris.utils.emptyNextBlockGrid
+import sco.carlukesoftware.jetris.viewmodel.GameViewModel
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier) {
+fun GameScreen(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    gameViewModel: GameViewModel = koinInject()
+) {
     Column(
         modifier = modifier
             .fillMaxSize(),
@@ -90,6 +96,8 @@ fun GameScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun GameScreenPreview() {
     JetrisTheme {
-        GameScreen()
+        GameScreen(
+            onBackClick = { }
+        )
     }
 }
