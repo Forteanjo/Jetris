@@ -10,7 +10,7 @@
 
 Jetris is a classic Tetris game clone built for Android using modern Android development tools and practices. This project showcases the use of Jetpack Compose for the UI, Kotlin for the programming language, and follows MVVM architecture principles.
 
-## Features
+## ✨ Features
 
 *   **Classic Tetris Gameplay:** Move, rotate, and drop falling tetrominoes to clear lines.
 *   **Responsive UI:** Game interface adapts to different screen sizes.
@@ -27,7 +27,7 @@ Jetris is a classic Tetris game clone built for Android using modern Android dev
     *   Ghost piece.
 
 
-## Tech Stack & Architecture
+## 🛠️ Tech Stack & Key Libraries
 
 *   **UI:** [Jetpack Compose](https://developer.android.com/jetpack/compose) - Android's modern toolkit for building native UI.
 *   **Language:** [Kotlin](https://kotlinlang.org/) - First-party support, concise, and expressive.
@@ -37,8 +37,8 @@ Jetris is a classic Tetris game clone built for Android using modern Android dev
     *   **Model:** Data classes representing game state (e.g., `GameState`, `GamePiece`, `BlockColor`), game grid, and piece shapes.
 *   **Asynchronous Programming:** [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) for managing the game loop and background tasks.
 *   **State Management:** [StateFlow](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/) for observable, lifecycle-aware state.
-*   **Dependency Injection (Optional - if you are using it, e.g., Koin/Hilt):**
-    *   `[Koin/Hilt/Manual]` - Specify your DI framework if used.
+*   **Dependency Injection :**
+    *   [Koin](https://insert-koin.io/)
 *   **Build System:** Gradle
 
 ## Core Game Logic Implemented
@@ -67,8 +67,19 @@ Jetris is a classic Tetris game clone built for Android using modern Android dev
     *   Select an emulator or connect an Android device.
     *   Click the "Run" button in Android Studio.
 
+**Prerequisites:**
+* Android Studio (latest stable version recommended - e.g., Iguana | 2023.2.1 or newer)
+* Android SDK
+* Min SDK 28 (Android 9)
+
 ## Project Structure (Key Components)
 
 ## Acknowledgements
 
 Font: [Planet Benson - Typodermic Fonts](https://www.1001freefonts.com/designer-typodermic-fonts-fontlisting.php)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+Donald McCaskey - [forteanjo@sky.com](mailto:forteanjo@sky.com)
