@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
@@ -34,6 +35,10 @@ fun GameScreen(
 ) {
     val gameState = gameViewModel.gameState.collectAsState()
     val nextBlockGrid = gameViewModel.nextBlockGrid.collectAsState()
+
+    val windowInfo = LocalWindowInfo.current
+    val containerSize = windowInfo.containerSize
+    val blockSize = (containerSize.width / (gameState.value.grid.size + nextBlockGrid.value.size)) * 0.6
 
     Column(
         modifier = modifier
@@ -63,6 +68,7 @@ fun GameScreen(
         ) {
             GameScreenGrid(
                 gameGrid = gameState.value.grid,
+                blockSize = blockSize.dp,
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -74,6 +80,7 @@ fun GameScreen(
 
             GameScreenGrid(
                 gameGrid = nextBlockGrid.value,
+                blockSize = blockSize.dp,
                 modifier = Modifier
                     .padding(8.dp)
             )

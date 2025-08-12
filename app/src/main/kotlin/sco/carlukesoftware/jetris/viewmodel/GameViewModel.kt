@@ -292,8 +292,8 @@ class GameViewModel : ViewModel() {
         }
 
         // Update state before spawning (to avoid collision with the piece that was just locked)
-        _gameState.update {
-            it.copy(
+        _gameState.update { gameState ->
+            gameState.copy(
                 grid = gridAfterClearingLines,
                 currentPiece = null, // Current piece is now locked
                 score = newScore,

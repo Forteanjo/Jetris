@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,9 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.serialization.json.Json.Default.configuration
 import sco.carlukesoftware.jetris.ui.components.BlockTitle
 import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
 import sco.carlukesoftware.jetris.ui.components.homeScreenGrid
@@ -30,12 +35,17 @@ fun HomeScreen(
     onPlayGameClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment
             .CenterHorizontally
     ) {
+        val windowInfo = LocalWindowInfo.current
+        val containerSize = windowInfo.containerSize
+        val blockSize = (containerSize.width / homeScreenGrid.size) * 0.6
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,6 +81,7 @@ fun HomeScreen(
             ) {
                 GameScreenGrid(
                     gameGrid = homeScreenGrid,
+                    blockSize = blockSize.dp,
                     modifier = Modifier
                         .padding(8.dp)
                 )
@@ -79,12 +90,13 @@ fun HomeScreen(
 
         Button(
             onClick = onPlayGameClick,
-            modifier = modifier
+            modifier = Modifier
+                .width(200.dp)
+                .height(64.dp)
         ) {
             Text(
                 text = "Play",
-                modifier = modifier
-                    .padding(8.dp),
+                modifier = Modifier,
                 fontSize = 36.sp
             )
         }

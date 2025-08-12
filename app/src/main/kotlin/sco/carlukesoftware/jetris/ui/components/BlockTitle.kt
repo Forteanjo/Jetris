@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sco.carlukesoftware.jetris.data.BlockColors
@@ -37,9 +38,14 @@ fun BlockTitle(modifier: Modifier = Modifier) {
         modifier = modifier
             .padding(1.dp)
     ) {
+        val windowInfo = LocalWindowInfo.current
+        val containerSize = windowInfo.containerSize
+
+        val blockSize = (containerSize.width / (title.length) * 0.6)
+
         title.forEachIndexed { index, char ->
             CharBlock(
-                size = 60.dp,
+                size = blockSize.dp,
                 blockColor = colors[index].blockColor,
                 borderColor = colors[index].borderColor,
                 char = char
