@@ -2,6 +2,8 @@ package sco.carlukesoftware.jetris.ui.screens
 
 import android.text.SpannedString
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,11 @@ import sco.carlukesoftware.jetris.ui.components.GameButtons
 import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
 import sco.carlukesoftware.jetris.ui.components.homeScreenGrid
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
+import sco.carlukesoftware.jetris.utils.GRID_COLUMNS
+import sco.carlukesoftware.jetris.utils.GRID_ROWS
+import sco.carlukesoftware.jetris.utils.GRID_SPACING
+import sco.carlukesoftware.jetris.utils.NEXT_BLOCK_GRID_COLUMNS
+import sco.carlukesoftware.jetris.utils.SCREEN_PADDING
 import sco.carlukesoftware.jetris.utils.emptyGameGrid
 import sco.carlukesoftware.jetris.utils.emptyNextBlockGrid
 import sco.carlukesoftware.jetris.viewmodel.GameViewModel
@@ -36,70 +43,112 @@ fun GameScreen(
     val gameState = gameViewModel.gameState.collectAsState()
     val nextBlockGrid = gameViewModel.nextBlockGrid.collectAsState()
 
-    val windowInfo = LocalWindowInfo.current
-    val containerSize = windowInfo.containerSize
-    val blockSize = (containerSize.width / (gameState.value.grid.size + nextBlockGrid.value.size)) * 0.6
-
-    Column(
+    BoxWithConstraints(
         modifier = modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment
-            .CenterHorizontally
+            .fillMaxSize()
+            .padding(SCREEN_PADDING)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(fraction = 0.2f),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BlockTitle(
-                modifier = modifier
-                    .padding(top = 12.dp)
-            )
+        // maxWidth and maxHeight are the available space AFTER screen padding
+
+        val availableWidth = this.maxWidth
+        val availableHeight = this.maxHeight // Full height for the content area
+
+
+        // --- Calculate BlockSize ---
+
+        // 1. Calculate how much width is needed for all horizontal elements
+        // Main grid columns + Next piece grid columns + spacing between them
+        val totalHorizontalBlocks = GRID_COLUMNS + NEXT_BLOCK_GRID_COLUMNS
+        val widthRequiredForGridsOnly = availableWidth - GRID_SPACING // Subtract fixed spacing first
+
+        // Calculate block size based on width, considering both grids
+        val blockSizeBasedOnWidth = if (totalHorizontalBlocks > 0) {
+            widthRequiredForGridsOnly / totalHorizontalBlocks
+        } else {
+            availableWidth // Fallback if no blocks, take full width (shouldn't happen)
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(fraction = 0.6f),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Top,
-        ) {
-            GameScreenGrid(
-                gameGrid = gameState.value.grid,
-                blockSize = blockSize.dp,
-                modifier = Modifier
-                    .padding(8.dp)
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .width(16.dp)
-            )
-
-            GameScreenGrid(
-                gameGrid = nextBlockGrid.value,
-                blockSize = blockSize.dp,
-                modifier = Modifier
-                    .padding(8.dp)
-            )
-
+        // 2. Calculate block size based on height (primarily for the main game grid)
+        // Let's assume the game area (main grid + title) takes up a certain percentage of height,
+        // and controls take the rest. Or, dedicate most height to the main grid.
+        val topAreaMaxHeight = availableHeight * 0.75f // e.g., Title + Grids take 75% height
+        // Adjust this factor based on your layout needs
+        val blockSizeBasedOnHeight = if (GRID_ROWS > 0) {
+            topAreaMaxHeight / GRID_ROWS
+        } else {
+            topAreaMaxHeight // Fallback
         }
 
-        Row(
+        // 3. The actual blockSize must be the minimum of these to fit both dimensions
+        val blockSize = minOf(blockSizeBasedOnWidth, blockSizeBasedOnHeight)
+
+        // Ensure blockSize is not zero or negative if calculations are off or space is too small
+        val finalBlockSize = if (blockSize > 0.dp) blockSize else 1.dp // Minimum 1.dp to avoid issues
+
+        // --- Layout the UI ---
+        Column(
             modifier = Modifier
                 .fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
+            horizontalAlignment = Alignment
+                .CenterHorizontally
         ) {
-            GameButtons(
-                onMoveLeft = { gameViewModel.onMoveLeft() },
-                onMoveRight = { gameViewModel.onMoveRight() },
-                onRotate = { gameViewModel.onRotate() },
-                onMoveDown = { gameViewModel.onHardDrop() },
+            BlockTitle(
+                modifier = Modifier
+                    .padding(
+                        top = 12.dp,
+                        bottom = 16.dp
+                    ) // Add some bottom padding too
             )
+
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // .height(IntrinsicSize.Min) // Optional: If you want the row to wrap content height based on calculated sizes
+                    .weight(0.75f), // Give more weight to the game area
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Top,
+            ) {
+                GameScreenGrid(
+                    gameGrid = gameState.value.grid,
+                    blockSize = blockSize,
+                    modifier = Modifier
+                        .padding(GRID_SPACING)
+                )
+
+                // Only show next block grid if there's enough space and it's not empty
+                if (finalBlockSize * NEXT_BLOCK_GRID_COLUMNS < (availableWidth - (finalBlockSize * GRID_COLUMNS) - GRID_SPACING)) {
+                    GameScreenGrid(
+                        gameGrid = nextBlockGrid.value, // Use the collected state
+                        blockSize = finalBlockSize,
+                        modifier = Modifier
+                            .padding(start = GRID_SPACING / 2) // Half spacing on the other side
+                    )
+                } else {
+                    // Optionally provide a smaller placeholder or hide if not enough space
+                    Spacer(
+                        modifier = Modifier
+                            .width(finalBlockSize * NEXT_BLOCK_GRID_COLUMNS)
+                    )
+                }
+            }
+
+            // Game Controls
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.25f), // Remaining space for controls
+                contentAlignment = Alignment.Center
+            ) {
+                GameButtons(
+                    onMoveLeft = { gameViewModel.onMoveLeft() },
+                    onMoveRight = { gameViewModel.onMoveRight() },
+                    onRotate = { gameViewModel.onRotate() },
+                    onMoveDown = { gameViewModel.onHardDrop() },
+                )
+            }
         }
+
     }
 }
 

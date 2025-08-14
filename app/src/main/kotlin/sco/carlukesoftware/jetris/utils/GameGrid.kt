@@ -1,5 +1,6 @@
 package sco.carlukesoftware.jetris.utils
 
+import androidx.compose.ui.unit.dp
 import sco.carlukesoftware.jetris.data.BlockColor
 import kotlin.math.floor
 
@@ -8,6 +9,10 @@ typealias GameGrid = Array<GameGridRow>
 
 const val GRID_COLUMNS = 10
 const val GRID_ROWS = 15
+
+val SCREEN_PADDING = 8.dp
+val GRID_SPACING = 16.dp // Spacing between main grid and next piece grid
+
 
 val emptyGameGrid: GameGrid = Array(GRID_ROWS) {
     // For each row, create a new row filled with EMPTY
