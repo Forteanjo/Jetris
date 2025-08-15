@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import sco.carlukesoftware.themeswitcher.data.AccentColor
 import sco.carlukesoftware.themeswitcher.data.AppTheme
 import sco.carlukesoftware.themeswitcher.data.ThemeMode
 
@@ -42,6 +43,7 @@ class ThemeManager(
 ) {
     private object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val ACCENT_COLOR = stringPreferencesKey("accent_color")
     }
 
     private val _currentTheme = MutableStateFlow(AppTheme(isDarkMode = false))
@@ -83,6 +85,21 @@ class ThemeManager(
         }
     }
 
+    fun updateAccentColor(accentColor: AccentColor) {
+        _currentTheme.value = _currentTheme.value.copy(
+            accentColor = accentColor.color
+        )
+        saveAccentColor(accentColor)
+    }
+
+    fun saveAccentColor(accentColor: AccentColor) {
+        externalScope.launch {
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.ACCENT_COLOR] = accentColor.name
+            }
+        }
+    }
+
     /**
      * Updates the application's theme mode.
      *
@@ -114,6 +131,8 @@ class ThemeManager(
             }
         }
     }
+
+
 
 
     /**
