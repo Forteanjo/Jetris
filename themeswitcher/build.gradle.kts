@@ -1,26 +1,20 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "sco.carlukesoftware.jetris"
+    namespace = "sco.carlukesoftware.themeswitcher"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "sco.carlukesoftware.jetris"
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        //noinspection EditedTargetSdkVersion
-        versionCode = libs.versions.app.versionCode.get().toInt()
-        versionName = libs.versions.app.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -94,17 +88,8 @@ dependencies {
 
     implementation(libs.bundles.androidx.material3)
 
-    implementation(libs.bundles.androidx.navigation3)
-
-    implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.preferences)
-
-    // Koin
-    implementation(libs.bundles.koin)
-
-    implementation(project(":themeswitcher"))
 
     testImplementation(libs.junit)
 

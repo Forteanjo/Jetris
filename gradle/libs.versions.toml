@@ -40,6 +40,8 @@ app-versionCode = "1"
 app-versionName = "1.0"
 
 jvmTarget = "21"
+appcompatVersion = "1.7.1"
+materialVersion = "1.12.0"
 
 
 [libraries]
@@ -85,6 +87,8 @@ androidx-preferences = { group = "androidx.preference", name = "preference-ktx",
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 koin-androidx-navigation = { group = "io.insert-koin", name = "koin-androidx-navigation", version.ref = "koin" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 
 [plugins]

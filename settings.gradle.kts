@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Jetris"
 include(":app")
+include(":themeswitcher")
