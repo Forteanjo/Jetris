@@ -1,13 +1,11 @@
 package sco.carlukesoftware.jetris.ui.screens
 
-import android.text.SpannedString
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,22 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 import sco.carlukesoftware.jetris.ui.components.BlockTitle
 import sco.carlukesoftware.jetris.ui.components.GameButtons
 import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
-import sco.carlukesoftware.jetris.ui.components.homeScreenGrid
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.utils.GRID_COLUMNS
 import sco.carlukesoftware.jetris.utils.GRID_ROWS
 import sco.carlukesoftware.jetris.utils.GRID_SPACING
 import sco.carlukesoftware.jetris.utils.NEXT_BLOCK_GRID_COLUMNS
 import sco.carlukesoftware.jetris.utils.SCREEN_PADDING
-import sco.carlukesoftware.jetris.utils.emptyGameGrid
-import sco.carlukesoftware.jetris.utils.emptyNextBlockGrid
 import sco.carlukesoftware.jetris.viewmodel.GameViewModel
 
 @Composable
@@ -49,7 +43,6 @@ fun GameScreen(
             .padding(SCREEN_PADDING)
     ) {
         // maxWidth and maxHeight are the available space AFTER screen padding
-
         val availableWidth = this.maxWidth
         val availableHeight = this.maxHeight // Full height for the content area
 

@@ -1,5 +1,11 @@
 package sco.carlukesoftware.jetris.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -43,7 +49,7 @@ fun MainNavigation(
 
     LaunchedEffect(systemDarkMode, themeMode) {
         if (themeMode == ThemeMode.System) {
-            themeManager.handleSystemThemeChange(systemDarkMode)
+            //themeManager.handleSystemThemeChange(systemDarkMode)
         }
     }
 
@@ -64,6 +70,28 @@ fun MainNavigation(
         NavDisplay(
             modifier = modifier,
             backStack = backStack,
+            onBack = {
+                backStack.removeLastOrNull()
+            },
+            transitionSpec = {
+                ContentTransform(
+                    targetContentEnter = fadeIn(tween(300)),
+                    initialContentExit = fadeOut(tween(300))
+                )
+            }
+//            transitionSpec = {
+//                if (isPush) {
+//                    ContentTransform(
+//                        slideInHorizontally({ it }) + fadeIn(),
+//                        slideOutHorizontally({ -it / 2 }) + fadeOut()
+//                    )
+//                } else {
+//                    ContentTransform(
+//                        slideInHorizontally({ -it }) + fadeIn(),
+//                        slideOutHorizontally({ it / 2 }) + fadeOut()
+//                    )
+//                }
+//            }
         ) { route ->
             when (route) {
                 is GameRoutes.HomeScreen -> NavEntry(route) {

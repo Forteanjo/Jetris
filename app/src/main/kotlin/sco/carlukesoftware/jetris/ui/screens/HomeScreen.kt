@@ -3,6 +3,7 @@ package sco.carlukesoftware.jetris.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,13 +30,32 @@ import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
 import sco.carlukesoftware.jetris.ui.components.homeScreenGrid
 import sco.carlukesoftware.jetris.ui.theme.JetrisTheme
 import sco.carlukesoftware.jetris.ui.theme.TetrisGridBorderColor
+import sco.carlukesoftware.jetris.utils.GRID_COLUMNS
+import sco.carlukesoftware.jetris.utils.GRID_SPACING
+import sco.carlukesoftware.jetris.utils.NEXT_BLOCK_GRID_COLUMNS
+import sco.carlukesoftware.jetris.utils.SCREEN_PADDING
 
 @Composable
 fun HomeScreen(
     onPlayGameClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(SCREEN_PADDING),
+        contentAlignment = Alignment.Center
+    ) {
+        // maxWidth and maxHeight are the available space AFTER screen padding
+        val availableWidth = this.maxWidth
+        val availableHeight = this.maxHeight // Full height for the content area
 
+        // 1. Calculate how much width is needed for all horizontal elements
+        // Main grid columns + Next piece grid columns + spacing between them
+        val totalHorizontalBlocks = homeScreenGrid.size
+        val widthRequiredForGridsOnly = availableWidth // Subtract fixed spacing first
+
+    }
     Column(
         modifier = modifier
             .fillMaxSize(),

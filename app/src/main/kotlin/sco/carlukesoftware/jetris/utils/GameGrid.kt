@@ -13,6 +13,7 @@ const val GRID_ROWS = 15
 val SCREEN_PADDING = 8.dp
 val GRID_SPACING = 16.dp // Spacing between main grid and next piece grid
 
+val MAX_BLOCK_SIZE = 90.dp
 
 val emptyGameGrid: GameGrid = Array(GRID_ROWS) {
     // For each row, create a new row filled with EMPTY

@@ -40,33 +40,33 @@ fun ThemeSwitcher(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            ThemeOption(
-                title = "Light",
-                description = "Always use light theme",
-                selected = themeMode is ThemeMode.Light,
-                onClick = { themeManager.updateThemeMode(ThemeMode.Light) }
-            )
-
-            ThemeOption(
-                title = "Dark",
-                description = "Always use dark theme",
-                selected = themeMode is ThemeMode.Dark,
-                onClick = { themeManager.updateThemeMode(ThemeMode.Dark) }
-            )
-
-            ThemeOption(
-                title = "Follow system",
-                description = "Match your device settings",
-                selected = themeMode is ThemeMode.System,
-                onClick = { themeManager.updateThemeMode(ThemeMode.System) }
-            )
-
-            ThemeOption(
-                title = "High contrast",
-                description = "Optimized for accessibility",
-                selected = themeMode is ThemeMode.HighContrast,
-                onClick = { themeManager.updateThemeMode(ThemeMode.HighContrast) }
-            )
+//            ThemeOption(
+//                title = "Light",
+//                description = "Always use light theme",
+//                selected = themeMode is ThemeMode.Light,
+//                onClick = { themeManager.updateThemeMode(ThemeMode.Light) }
+//            )
+//
+//            ThemeOption(
+//                title = "Dark",
+//                description = "Always use dark theme",
+//                selected = themeMode is ThemeMode.Dark,
+//                onClick = { themeManager.updateThemeMode(ThemeMode.Dark) }
+//            )
+//
+//            ThemeOption(
+//                title = "Follow system",
+//                description = "Match your device settings",
+//                selected = themeMode is ThemeMode.System,
+//                onClick = { themeManager.updateThemeMode(ThemeMode.System) }
+//            )
+//
+//            ThemeOption(
+//                title = "High contrast",
+//                description = "Optimized for accessibility",
+//                selected = themeMode is ThemeMode.HighContrast,
+//                onClick = { themeManager.updateThemeMode(ThemeMode.HighContrast) }
+//            )
         }
     }
 }
