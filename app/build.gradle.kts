@@ -34,16 +34,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 
     kotlin {
         compilerOptions {
-            freeCompilerArgs.add("-Xcontext-sensitive-resolution")
-            jvmTarget = JvmTarget.fromTarget("21")
+            freeCompilerArgs.addAll("-Xcontext-sensitive-resolution")
+            jvmTarget = JvmTarget.fromTarget(libs.versions.jvmTarget.get())
         }
     }
+
 
     buildFeatures {
         compose = true
@@ -103,6 +104,10 @@ dependencies {
 
     // Koin
     implementation(libs.bundles.koin)
+
+    // Local libraries
+    implementation(libs.kotlin.extensions.library)
+    implementation(libs.compose.extensions.library)
 
     implementation(project(":themeswitcher"))
 
