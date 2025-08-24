@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import sco.carlukesoftware.jetris.ui.components.BlockTitle
 import sco.carlukesoftware.jetris.ui.components.GameButtons
 import sco.carlukesoftware.jetris.ui.components.GameScreenGrid
@@ -32,7 +32,7 @@ import sco.carlukesoftware.jetris.viewmodel.GameViewModel
 fun GameScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = koinInject()
+    gameViewModel: GameViewModel = koinViewModel()
 ) {
     val gameState = gameViewModel.gameState.collectAsState()
     val nextBlockGrid = gameViewModel.nextBlockGrid.collectAsState()
